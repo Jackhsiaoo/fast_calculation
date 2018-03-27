@@ -37,7 +37,7 @@ int main()
 	printf("sum(1..10) = %d\n",j);
 
 	j = 0;
-	#pragma omp parallel for reduction(+:j)
+	#pragma omp parallel for private(i) reduction(+:j)
 	for(i=0;i<=100;++i)
 	{
 		j += i;
