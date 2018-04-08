@@ -17,13 +17,16 @@ int function(int n)
 int main()
 {
 	clock_t t1, t2;				// variables for computing clocks 
-	double **A, *x, *b, *c, T0; 	// x = 1234, a location in memory, x[0] the value at memory 1234, 1235, 1236, ... 1041
+	double **A, *x, *b, *c, T0,T1; 	// x = 1234, a location in memory, x[0] the value at memory 1234, 1235, 1236, ... 1041
 	double t;	
 	int **C;
-	int i, j, k, L, M, N=20; //
+	int i, j, k, L, M, N; //
 	j=0;
 	
-
+	printf("please type in the size of matrix N*N:(N is 8 multiple)");
+	scanf("%d", &N);
+	printf("N= %d\n",N);
+	
 	////******************///////////////
 	A = (double **) malloc( N * sizeof(double*) ); // 在記憶體中拿N個double*記憶體, 
 													   // 並且把一開始指標放在A, A[0], A[1], A[2], A[N-1]
@@ -58,8 +61,8 @@ int main()
 			}
 			b[i] = t;
 		}
-		//output check out ==ok
-		
+		//output check output ==ok
+		/* 
 		printf("A Matrix:\n");
 		for(i=0;i<N;++i) 
 		{ 
@@ -75,30 +78,31 @@ int main()
 		
 				printf("%f\n",x[j]);
 		}
+		
 		printf("B Matrix:\n");
 		for(i=0;i<N;++i) 
 		{ 
 		
-			printf("%f\n",b[i]);
+			printf("%f\t",b[i]);
 		}
-		
+		*/
 		t2 = clock();
     	T0=(t2-t1)/(double)(CLOCKS_PER_SEC);
 		printf("cost time=%.3f\n", T0);
 
 	//b=A*x  ///////parallel version
 	t1 = clock();
-	M = N/4;
-		#pragma omp parallel num_threads(4) private(k)
+	M = N/8;
+		#pragma omp parallel num_threads(8) private(k)
 		{
 			k = omp_get_thread_num();
 			//printf("the seed at thread %d is : %d\n",k,time(NULL)+100*k);
 			srand(time(NULL)+100*k);			// 在每一個 thread 中設定起始值 
 
-			#pragma omp parallel for // 取亂數 
+			#pragma omp parallel for private(i,j)// 取亂數 
 			for(i=k*M;i<(k+1)*M;++i)
 			{
-			
+				
 				for(j=0;j<N;++j)
 				{
 					A[i][j] = rand() % N*N;
@@ -108,11 +112,11 @@ int main()
 		}
 		
 		
-		#pragma omp parallel for  private(i)
+		#pragma omp parallel for private(i,j)
 		for(i=0;i<N;++i) 
 		{
 			t = 0.0;
-			#pragma omp parallel for reduction(+: t) private(j)
+			#pragma omp parallel for reduction(+: t) 
 			for(j=0;j<N;++j)
 			{
 				t += A[i][j]*x[j];
@@ -120,8 +124,8 @@ int main()
 			b[i] = t;
 		}
 
-		//output check out ==ok
-		
+		//output check output ==ok
+		/* 
 		printf("A Matrix:\n");
 		#pragma omp parallel for private(i,j)
 		for(i=0;i<N;++i) 
@@ -139,17 +143,27 @@ int main()
 		
 				printf("%f\n",x[j]);
 		}
+		
 		printf("B Matrix:\n");
 		#pragma omp parallel for private(i)
 		for(i=0;i<N;++i) 
 		{ 
 		
-			printf("%f\n",b[i]);
+			printf("%f\t",b[i]);
+		}
+		*/
+		t2 = clock();
+    	T1=(t2-t1)/(double)(CLOCKS_PER_SEC);
+		printf("parallel cost time=%.3f\n", T1);
+		if(T0<T1)
+		{
+			printf("parallel is failed\n");
+			printf("n number need to be larger than 1600");
+		}
+		else{
+			printf("parallel is successful");
 		}
 		
-		t2 = clock();
-    	T0=(t2-t1)/(double)(CLOCKS_PER_SEC);
-		printf("parallel cost time=%.3f\n", T0);
 
 	return 0;
 } 
