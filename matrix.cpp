@@ -93,16 +93,16 @@ int main()
 	//b=A*x  ///////parallel version
 	t1 = clock();
 	M = N/8;
-		#pragma omp parallel num_threads(8) private(k)
+		#pragma omp parallel num_threads(8) private(i,j,k)
 		{
 			k = omp_get_thread_num();
 			//printf("the seed at thread %d is : %d\n",k,time(NULL)+100*k);
 			srand(time(NULL)+100*k);			// 在每一個 thread 中設定起始值 
 
-			#pragma omp parallel for private(i,j)// 取亂數 
+			// 取亂數 
 			for(i=k*M;i<(k+1)*M;++i)
 			{
-				
+				//#pragma omp parallel for private(j)
 				for(j=0;j<N;++j)
 				{
 					A[i][j] = rand() % N*N;
@@ -111,9 +111,12 @@ int main()
 			}
 		}
 		
+	M = N/8;
+	#pragma omp parallel num_threads(8) private(i,j,k)
+	{
+		k = omp_get_thread_num();
 		
-		#pragma omp parallel for private(i,j)
-		for(i=0;i<N;++i) 
+		for(i=k*M;i<(k+1)*M;++i) 
 		{
 			t = 0.0;
 			#pragma omp parallel for reduction(+: t) 
@@ -123,21 +126,22 @@ int main()
 			}
 			b[i] = t;
 		}
-
+	}
 		//output check output ==ok
-		/* 
+		
 		printf("A Matrix:\n");
-		#pragma omp parallel for private(i,j)
+		/*
 		for(i=0;i<N;++i) 
-		{ 
+		{   
+			//#pragma omp parallel for ordered  // more slow
 			for(j=0;j<N;++j)
-			{
+			{	
 				printf("%f ",A[i][j]);
 			}
 			printf("\n");
 		}
 		printf("X Matrix:\n");
-		#pragma omp parallel for private(j)
+		//#pragma omp parallel for private(j)
 		for(j=0;j<N;++j) 
 		{ 
 		
@@ -145,13 +149,14 @@ int main()
 		}
 		
 		printf("B Matrix:\n");
-		#pragma omp parallel for private(i)
+		//#pragma omp parallel for private(i)
 		for(i=0;i<N;++i) 
 		{ 
 		
 			printf("%f\t",b[i]);
 		}
 		*/
+		printf("\n");
 		t2 = clock();
     	T1=(t2-t1)/(double)(CLOCKS_PER_SEC);
 		printf("parallel cost time=%.3f\n", T1);
