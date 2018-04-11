@@ -3,11 +3,11 @@
 #include <omp.h>
 #include <math.h>
 #include <time.h>
-#define DEBUG  1
+#define DEBUG  0
 int quicksort1(int *x, int left, int right);
-int partition(int *x, int low, int high) ;
+int partition(int *x, int left, int right) ;
 void swap(int *x,int a, int b);
-int findK(int *x, int left, int right, int k, int prePart);
+int findK(int *x, int left, int right, int k, int prepart);
 int main(){
 	clock_t t1, t2;				// variables for computing clocks 
 	int *x, *y, s, p;
@@ -18,7 +18,7 @@ int main(){
 	srand( time(NULL) );
 	for(i=0;i<N;++i)
 	{
-		y[i] = x[i] = rand() % N;
+		y[i]= x[i] = rand() % N;
 	}
 	for(i=0;i<N;++i)
 	{
@@ -27,7 +27,10 @@ int main(){
 	int kv=N/2+1;
 	int medium = 0;
 	printf("******partition********\n");
-	printf("meddle= %d\n", findK(x, 0, N,kv,-1) );
+	
+	int prepart=partition(y,0,N);
+	printf("prepart=%d\n",prepart);
+	printf("middle= %d\n", findK(x, 0,N,kv,prepart) );
 
 	return 0;
 }
@@ -90,7 +93,6 @@ int quicksort1(int *x, int left, int right)
 }
 int partition(int *x, int left, int right)
  {  
-		
     int i, j, k;
 	int pivot, t;
 	
@@ -110,12 +112,11 @@ int partition(int *x, int left, int right)
 			#endif
       		if(i>=j) break;
       		swap(x,i,j);
-      		#if DEBUG2
+      		#if DEBUG
 			for(k=left;k<right;++k)
 			{
 				printf("x[%d]=%d\n",k,x[k]);
 			}
-			system("pause");
 			#endif
 		} 
         x[left] = x[j];
@@ -124,21 +125,26 @@ int partition(int *x, int left, int right)
         return j;  
 	} 
 }
-int findK(int *x, int left, int right, int k, int prePart)
+int findK(int *x, int left, int right, int k, int prepart)
 {  
-        if(left >= right)
+		int i;
+        if(left > right-1)
 		{  
-            return 0;  
+            return x[prepart];  
         }  
         int pos = partition(x, left, right);  
-        int leftnumber = pos -left  + 1;//左???  
+        int leftnumber = pos -left  + 1;//左??? 
+		printf("pos=%d,prepart=%d,leftnumber=%d,k=%d\n",pos,prepart,leftnumber,k);
+		system("pause"); 
         if(k > leftnumber)
-		{//中位?在分裂?右?，??分裂?作?下次迭代的prePart  
-            findK(x, pos + 1, right, k - leftnumber, pos);  
+		{  
+		   //中位數在pivot右邊 找 pivot 右邊 
+            findK(x, pos +1, right, k - leftnumber, pos);  
         }  
         else if(k < leftnumber)
-		{//中位?在分裂?左?，本次的prePart作?下次迭代的prePart  
-            findK(x, left, pos - 1, k, prePart);  
+		{   
+			//中位數在 pivot左邊 找pivot 左邊    前一步再做一次  
+            findK(x, left, pos -1, k, prepart);  
         } 
         else
 		{
