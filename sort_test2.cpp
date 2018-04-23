@@ -10,27 +10,63 @@ void swap(int *x,int a, int b);
 int findK(int *x, int left, int right, int k, int prepart);
 int main(){
 	clock_t t1, t2;				// variables for computing clocks 
-	int *x, *y, s, p;
+	int *x, *y,*z, s, p;
 	double T1;
-	int i, j, N=9;
+	int i, j, N;
+	printf("please dicide the number of N:");
+	scanf("%d", &N);
+	printf("N= %d\n",N);
 	x = (int *) malloc( N * sizeof(int) );
 	y = (int *) malloc( N * sizeof(int) );
+	z = (int *) malloc( N * sizeof(int) );
 	srand( time(NULL) );
 	for(i=0;i<N;++i)
 	{
-		y[i]= x[i] = rand() % N;
+		z[i]=y[i]= x[i] = rand() % N;
 	}
 	for(i=0;i<N;++i)
 	{
 		printf("x[%d]=%d\n",i,x[i]);
 	}
-	int kv=N/2+1;
-	int medium = 0;
-	printf("******partition********\n");
-	
 	int prepart=partition(y,0,N);
-	printf("prepart=%d\n",prepart);
-	printf("middle= %d\n", findK(x, 0,N,kv,prepart) );
+	for(i=0;i<N;++i) 
+		{
+			for(j=i+1;j<N;++j)
+			{
+				if(y[i]>y[j]) 
+				{
+					s = y[i];
+					y[i] = y[j];
+					y[j] = s;
+				}
+			}
+		}
+	printf("*********sorting********\n");
+	for(i=0;i<N;++i)
+	{
+		printf("y[%d]=%d\n",i,y[i]);
+	}
+	int kv=N/2+1;
+	double medium = 0;
+	double medium1 = 0;
+	double medium2 = 0;
+	if(N%2==1)
+	{
+		medium=findK(x, 0,N,kv,prepart);
+		printf("medium= %f\n", medium);
+	}
+	else if(N%2==0)
+	{
+		medium1=findK(x, 0,N,kv,prepart);
+		printf("medium1= %f\n", medium1);
+		medium2=findK(z, 0,N,kv-1,prepart);
+		printf("medium2= %f\n", medium2);
+		medium=(medium1+medium2)/2;
+		printf("medium= %f\n", medium);
+		
+		
+	}
+	
 
 	return 0;
 }
@@ -134,8 +170,8 @@ int findK(int *x, int left, int right, int k, int prepart)
         }  
         int pos = partition(x, left, right);  
         int leftnumber = pos -left  + 1;//左??? 
-		printf("pos=%d,prepart=%d,leftnumber=%d,k=%d\n",pos,prepart,leftnumber,k);
-		system("pause"); 
+		//printf("pos=%d,prepart=%d,leftnumber=%d,k=%d\n",pos,prepart,leftnumber,k);
+		//system("pause"); 
         if(k > leftnumber)
 		{  
 		   //中位數在pivot右邊 找 pivot 右邊 
