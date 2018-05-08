@@ -87,11 +87,11 @@ int Fast_Fourier_Transform(double *y_re, double *y_im, double *x_re, double *x_i
 			y_re[k]     = y_zero_re[k] + a1 + a2;   
 			y_im[k]     = y_zero_im[k] + b1 + b2;
 			//q%3==1
-			y_re[k+N/3] = y_zero_re[k] + w_N_re*(a1+a2) - w_N_im*(b1-b2); 
-			y_im[k+N/3] = y_zero_im[k] + w_N_re*(b1+b2) + w_N_im*(a1-a2);
+			y_re[k+N/3] = y_zero_re[k] - 0.5*a1 + 0.5*sqrt(3)*b1 - 0.5*a2 - 0.5*sqrt(3)*b2; 
+			y_im[k+N/3] = y_zero_im[k] - 0.5*sqrt(3)*a1 - 0.5*b1 + 0.5*sqrt(3)*a2 - 0.5*b2;
 			//r%3==2
-			y_re[k+2*N/3] = y_zero_re[k] + w_N_re*(a1+a2) + w_N_im*(b1-b2);
-			y_im[k+2*N/3]= y_zero_im[k] + w_N_re*(b1+b2) - w_N_im*(a1-a2);
+			y_re[k+2*N/3]= y_zero_re[k] - 0.5*a1 - 0.5*sqrt(3)*b1 - 0.5*a2 + 0.5*sqrt(3)*b2;
+			y_im[k+2*N/3]= y_zero_im[k] + 0.5*sqrt(3)*a1 - 0.5*b1 - 0.5*sqrt(3)*a2 - 0.5*b2;
 			
 			temp = w_re;
 			w_re = w_re*w_N_re - w_im*w_N_im;
