@@ -1,23 +1,31 @@
 #include <stdio.h>
 #include <stdlib.h> 
 #include <math.h>
-#define m 30 
+#include <time.h>
+#define m 14348907 
 int Fast_Fourier_Transform(double *y_re, double *y_im, double *x_re, double *x_im, int N);
 
 int main()
 {
 	int i;
+	clock_t t1, t2;
+    double T0,T1;
 	double y_re[m], y_im[m], x_re[m], x_im[m];
 	for(i=0;i<m;++i)
 	{
 		x_re[i] = i;
 		x_im[i] = 0.0;
 	}
+	t1 = clock();
 	Fast_Fourier_Transform(y_re, y_im, x_re, x_im, m);
-	for(i=0;i<m;++i)
+	t2 = clock();
+	T0=(t2-t1)/(double)(CLOCKS_PER_SEC);
+	printf("cost time=%.3f\n", T0);
+	/*for(i=0;i<m;++i)
 	{
 		printf("%f + %f i\n", y_re[i], y_im[i]);
 	}
+	*/ 
 	
 	 
 }
